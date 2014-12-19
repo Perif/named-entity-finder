@@ -8,7 +8,7 @@ A Clojure library for named entity extraction.
 
 ```clojure
 (ns my-ns
-  (:require [named-entity.core :refer all]))
+  (:require [named-entity.core :refer [extract-entities ?e]]))
 
 ;; Extract entities of a given type (person, location, date or time)
 
