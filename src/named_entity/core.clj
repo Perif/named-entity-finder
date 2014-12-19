@@ -1,6 +1,8 @@
 (ns named-entity.core
  (:require [clojure.java.io :as io])
- (:import [opennlp.tools.namefind NameFinderME TokenNameFinderModel]))
+ (:import [opennlp.tools.namefind 
+           NameFinderME 
+           TokenNameFinderModel]))
 
 ;; Named Entity Extraction Tools
 ;; ****************************************************
@@ -14,29 +16,34 @@
   "Helper function that can be used to load training data
    to test the named entity extractor"
   [f]
-  (slurp (str "training-data/" f ".txt")))
+  (slurp 
+   (str "training-data/" f ".txt")))
 
 (defn extract-span
   "Extracts the information from a span"
   [s]
-  (let [start (.getStart s)
-        end (.getEnd s)
+  (let [start      (.getStart s)
+        end        (.getEnd s)
         token-type (.getType s)]
-    { :token token-type :start start :end end }))
+    { :token token-type 
+      :start start 
+      :end end }))
 
 (defn- make-name-finder
   "Builds a named entity classifier"
   [model]
   (with-open [model-input-stream (io/input-stream model)]
     (NameFinderME.
-      (TokenNameFinderModel. model-input-stream))))
+      (TokenNameFinderModel. 
+        model-input-stream))))
 
 (defn- in?
   "Determine whether a sequence xs contains x"
   [xs x]
   (if (empty? xs)
     false
-    (reduce #(or %1 %2) (map #(= %1 x) xs))))
+    (reduce #(or %1 %2) 
+      (map #(= %1 x) xs))))
 
 (defn- valid-finder? [f]
   (in? [:person :date :time :location] (keyword f)))
