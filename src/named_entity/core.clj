@@ -55,6 +55,7 @@
     (make-name-finder
       (str "models/namefind/en-ner-" (name finder-type) ".bin"))))
 
+;; Built in named entity finders for a particular type of entity
 ;; ****************************************************
 
 (def person-finder   (finder :person))
