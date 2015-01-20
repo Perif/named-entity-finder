@@ -75,7 +75,8 @@
       (fn [entity]
         (let [[start end] ((juxt :start :end :token-type) entity)
                e (subvec tokens start end)]
-          {:token (:token entity) :value (clojure.string/join " " e)}))
+          {:token (:token entity) 
+           :value (clojure.string/join " " e)}))
          entities)))
 
 (defn extract-entities
@@ -86,7 +87,10 @@
       (map deref
         (doall (map
                  #(future (extract-entities % sentence))
-                  [:person :date :time :location])))))
+                  [:person 
+                   :date 
+                   :time 
+                   :location])))))
   ([finder-type sentence]
    (->> sentence
         (tokenize)
