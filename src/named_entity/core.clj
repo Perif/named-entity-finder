@@ -1,5 +1,6 @@
 (ns named-entity.core
- (:require [clojure.java.io :as io])
+ (:require [clojure.string :refer [join]]
+           [clojure.java.io :as io])
  (:import [opennlp.tools.namefind 
            NameFinderME 
            TokenNameFinderModel]))
@@ -76,7 +77,7 @@
         (let [[start end] ((juxt :start :end :token-type) entity)
                e (subvec tokens start end)]
           {:token (:token entity) 
-           :value (clojure.string/join " " e)}))
+           :value (join " " e)}))
          entities)))
 
 (defn extract-entities
