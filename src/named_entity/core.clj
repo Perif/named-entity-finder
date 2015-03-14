@@ -1,9 +1,12 @@
 (ns named-entity.core
  (:require [clojure.string :refer [join]]
-           [clojure.java.io :as io])
- (:import [opennlp.tools.namefind 
-           NameFinderME 
+           [clojure.java.io :as io]
+           [duckling.core :as duckling])
+ (:import [opennlp.tools.namefind
+           NameFinderME
            TokenNameFinderModel]))
+
+;; (duckling/load!)
 
 ;; Named Entity Extraction Tools
 ;; ****************************************************
@@ -17,7 +20,7 @@
   "Helper function that can be used to load training data
    to test the named entity extractor"
   [f]
-  (slurp 
+  (slurp
    (str "training-data/" f ".txt")))
 
 (defn extract-span
@@ -26,16 +29,18 @@
   (let [start      (.getStart s)
         end        (.getEnd s)
         token-type (.getType s)]
-    { :token token-type 
-      :start start 
+    { :token token-type
+      :start start
       :end end }))
 
 (defn- make-name-finder
   "Builds a named entity classifier"
   [model]
-  (with-open [model-input-stream (io/input-stream model)]
+  (with-open
+    [model-input-stream
+      (io/input-stream model)]
     (NameFinderME.
-      (TokenNameFinderModel. 
+      (TokenNameFinderModel.
         model-input-stream))))
 
 (defn- in?
@@ -43,7 +48,7 @@
   [xs x]
   (if (empty? xs)
     false
-    (reduce #(or %1 %2) 
+    (reduce #(or %1 %2)
       (map #(= %1 x) xs))))
 
 (defn- valid-finder? [f]
@@ -76,9 +81,19 @@
       (fn [entity]
         (let [[start end] ((juxt :start :end :token-type) entity)
                e (subvec tokens start end)]
-          {:token (:token entity) 
+          {:token (:token entity)
            :value (join " " e)}))
          entities)))
+
+(defn extract-time
+  "Extracts a time stamp from a string i.e
+   (extract-time \"Tomorrow at 6pm\"
+  "
+  [input]
+  (let [parsed (duckling/parse :en$core input [:time])]
+    (when (> (count parsed) 0)
+      (let [extracted-time (first parsed)]
+        (get-in extracted-time [:value :value])))))
 
 (defn extract-entities
   "Extract named entities from a sentence
@@ -88,10 +103,10 @@
       (map deref
         (doall (map
                  #(future (extract-entities % sentence))
-                  [:person 
-                   :date 
-                   :time 
-                   :location])))))
+                   [ :person
+                     :date
+                     :time
+                     :location])))))
   ([finder-type sentence]
    (->> sentence
         (tokenize)
@@ -100,3 +115,11 @@
 ;; An alias for a nicer DSL
 
 (def ?e extract-entities)
+
+;; Clarity.ai specific code
+
+(defn clarity-extract [input]
+  (let [base-map {:entities (into [] (extract-entities input))
+                  :action input
+                  :when (extract-time input)}]
+    base-map))

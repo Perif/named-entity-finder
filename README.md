@@ -4,6 +4,18 @@ A Clojure library for named entity extraction.
 
 *IN PROGRESS*
 
+```clojure
+
+(clarity-extract "Call John Doe from London on Wednesday 6pm")
+
+{:entities [
+  {:token "date", :value "Wednesday"}
+  {:token "location", :value "London"}],
+ :action "Call John Doe from London on Wednesday 6pm",
+ :when "2015-03-18T18:00:00.000Z"}
+
+```
+
 ## Usage
 
 ```clojure
