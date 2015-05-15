@@ -106,7 +106,7 @@
                    [ :person
                      :date
                      :time
-                     :location])))))
+                     :location ])))))
   ([finder-type sentence]
    (->> sentence
         (tokenize)
